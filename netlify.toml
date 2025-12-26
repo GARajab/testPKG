@@ -1,4 +1,3 @@
-# netlify.toml
 [build]
   publish = "public"
   functions = "netlify/functions"
@@ -12,4 +11,5 @@
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
-    Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"

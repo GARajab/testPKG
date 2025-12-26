@@ -1,13 +1,13 @@
 {
-    "name": "ps4-pkg-installer",
+    "name": "ps4-web-installer",
     "version": "1.0.0",
-    "description": "Web-based PS4 package installer",
+    "description": "Direct PS4 PKG installer from web",
     "main": "index.js",
     "scripts": {
         "build": "echo 'No build needed'"
     },
     "dependencies": {
+        "node-fetch": "^2.6.7",
         "buffer": "^6.0.3"
-    },
-    "devDependencies": {}
+    }
 }

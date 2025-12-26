@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS4 Web Package Installer</title>
+    <title>PS4 Store Installer</title>
     <style>
         * {
             margin: 0;
@@ -13,26 +13,29 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            width: 100%;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
         }
 
         .header {
-            text-align: center;
             margin-bottom: 40px;
         }
 
@@ -48,38 +51,39 @@
         .header .subtitle {
             font-size: 1.2em;
             opacity: 0.8;
+            margin-bottom: 20px;
         }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-        }
-
-        input[type="url"] {
-            width: 100%;
-            padding: 15px 20px;
+        .package-card {
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 5px solid #00d4ff;
         }
 
-        input[type="url"]:focus {
-            outline: none;
-            border-color: #00d4ff;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        .package-card h2 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        input[type="url"]::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+        .package-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
         }
 
         .btn {
@@ -88,21 +92,21 @@
             justify-content: center;
             background: linear-gradient(45deg, #00d4ff, #0099ff);
             color: white;
-            padding: 16px 40px;
+            padding: 18px 45px;
             border: none;
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
-            width: 100%;
-            margin-top: 10px;
+            margin: 20px 10px;
+            min-width: 200px;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.4);
         }
 
         .btn:disabled {
@@ -112,80 +116,16 @@
         }
 
         .btn i {
-            margin-right: 10px;
-            font-size: 1.2em;
+            margin-right: 12px;
+            font-size: 1.3em;
         }
 
-        .result {
-            margin-top: 40px;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            border-left: 5px solid #00d4ff;
-            display: none;
+        .btn-danger {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
         }
 
-        .result.show {
-            display: block;
-            animation: slideIn 0.5s ease;
-        }
-
-        .result h2 {
-            margin-bottom: 20px;
-            color: #00d4ff;
-        }
-
-        .package-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .instructions {
-            background: rgba(0, 148, 255, 0.1);
-            border-left: 4px solid #0094ff;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .instructions h3 {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-
-        .instructions h3 i {
-            margin-right: 10px;
-        }
-
-        .instructions ol {
-            margin-left: 25px;
-        }
-
-        .instructions li {
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        .install-link {
-            display: block;
-            background: rgba(0, 212, 255, 0.2);
-            border: 2px dashed #00d4ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-            color: #00d4ff;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .install-link:hover {
-            background: rgba(0, 212, 255, 0.3);
-            transform: scale(1.02);
+        .btn-success {
+            background: linear-gradient(45deg, #00b09b, #96c93d);
         }
 
         .loading {
@@ -195,11 +135,11 @@
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #00d4ff;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #00d4ff;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
@@ -214,10 +154,40 @@
             }
         }
 
+        .status {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .status.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            display: block;
+        }
+
+        .status.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            color: #ff0000;
+            display: block;
+        }
+
+        .status.info {
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            display: block;
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(-20px);
             }
 
             to {
@@ -226,41 +196,64 @@
             }
         }
 
-        .error {
-            background: rgba(255, 87, 87, 0.2);
-            border-left: 5px solid #ff5757;
+        .instructions {
+            background: rgba(0, 148, 255, 0.15);
+            border-left: 4px solid #0094ff;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #0094ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+
+        .qr-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 20px auto;
+        }
+
+        .direct-link {
+            margin-top: 20px;
             padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-        }
-
-        .error.show {
-            display: block;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-10px);
-            }
-
-            75% {
-                transform: translateX(10px);
-            }
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
         }
 
         .footer {
             margin-top: 40px;
-            text-align: center;
             opacity: 0.7;
             font-size: 0.9em;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
         }
 
         @media (max-width: 768px) {
@@ -271,155 +264,233 @@
             .header h1 {
                 font-size: 2em;
             }
+
+            .btn {
+                width: 100%;
+                margin: 10px 0;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-gamepad"></i> PS4 Web Installer</h1>
-            <div class="subtitle">Install packages directly from URL to your PS4</div>
+            <h1><i class="fas fa-store"></i> PS4 Store Installer</h1>
+            <div class="subtitle">One-click installation for PS4 Store Package</div>
         </div>
 
-        <!-- THIS IS THE URL INPUT FIELD -->
-        <div class="form-group">
-            <label for="pkgUrl"><i class="fas fa-link"></i> Enter PKG URL:</label>
-            <input type="url" id="pkgUrl" placeholder="https://example.com/game.pkg" required>
+        <div class="package-card">
+            <h2><i class="fas fa-box"></i> Store Package</h2>
+            <div class="package-info">
+                <div class="info-item">
+                    <span>Package:</span>
+                    <span><strong>Store.pkg</strong></span>
+                </div>
+                <div class="info-item">
+                    <span>Source:</span>
+                    <span>GitHub Repository</span>
+                </div>
+                <div class="info-item">
+                    <span>Size:</span>
+                    <span id="fileSize">Checking...</span>
+                </div>
+                <div class="info-item">
+                    <span>Status:</span>
+                    <span id="fileStatus">Verifying...</span>
+                </div>
+            </div>
         </div>
-
-        <button class="btn" id="generateBtn" onclick="startInstallation()">
-            <i class="fas fa-bolt"></i> Generate & Install
-        </button>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Processing package URL...</p>
+            <p>Preparing installation...</p>
         </div>
 
-        <div class="error" id="error"></div>
+        <div class="status" id="status"></div>
 
-        <div class="result" id="result">
-            <h2><i class="fas fa-check-circle"></i> Ready to Install!</h2>
+        <div class="instructions">
+            <h3><i class="fas fa-list-ol"></i> Installation Instructions:</h3>
+            <ol id="instructionList">
+                <li>Click the "Install on PS4" button below</li>
+                <li>On your PS4, open the browser and navigate to the installation page</li>
+                <li>Click "Start Installation" on the PS4 browser</li>
+                <li>The PS4 will download and install the package automatically</li>
+                <li>Check your PS4 notifications for installation progress</li>
+            </ol>
+        </div>
 
-            <div class="package-info" id="packageInfo"></div>
+        <div>
+            <button class="btn btn-success" onclick="startPS4Installation()" id="installBtn">
+                <i class="fas fa-download"></i> Install on PS4
+            </button>
 
-            <div class="instructions">
-                <h3><i class="fas fa-list-ol"></i> Installation Instructions:</h3>
-                <ol id="instructionList"></ol>
-            </div>
+            <button class="btn" onclick="showQRCode()" id="qrBtn">
+                <i class="fas fa-qrcode"></i> Show QR Code
+            </button>
 
-            <a href="#" class="install-link" id="installLink" target="_blank">
-                <i class="fas fa-external-link-alt"></i> Click here to open installer on PS4
-            </a>
-
-            <button class="btn" onclick="copyInstallLink()">
-                <i class="fas fa-copy"></i> Copy PS4 Installer Link
+            <button class="btn" onclick="copyDirectLink()" id="copyBtn">
+                <i class="fas fa-copy"></i> Copy PS4 Link
             </button>
         </div>
 
+        <div class="qr-container" id="qrContainer" style="display: none;">
+            <h3><i class="fas fa-mobile-alt"></i> Scan with PS4 Camera</h3>
+            <div id="qrcode"></div>
+            <div class="direct-link" id="directLink"></div>
+        </div>
+
         <div class="footer">
-            <p><i class="fas fa-info-circle"></i> Works best on PS4 9.00 or lower with browser exploit</p>
+            <p><i class="fas fa-info-circle"></i> Works on PS4 with browser access. Ensure you have proper permissions.
+            </p>
         </div>
     </div>
 
     <script>
-        async function startInstallation() {
-            const pkgUrl = document.getElementById('pkgUrl').value.trim();
+        // Configuration
+        const PKG_URL = 'https://github.com/GARajab/testPKG/raw/main/Store.pkg';
+        const PKG_NAME = 'Store.pkg';
+        const DIRECT_INSTALL_URL = '/install.html';
 
-            if (!pkgUrl) {
-                showError('Please enter a package URL');
-                return;
-            }
+        // DOM Elements
+        const installBtn = document.getElementById('installBtn');
+        const qrBtn = document.getElementById('qrBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const loading = document.getElementById('loading');
+        const status = document.getElementById('status');
+        const qrContainer = document.getElementById('qrContainer');
+        const directLink = document.getElementById('directLink');
+        const fileSize = document.getElementById('fileSize');
+        const fileStatus = document.getElementById('fileStatus');
 
-            if (!pkgUrl.startsWith('http')) {
-                showError('Please enter a valid URL starting with http:// or https://');
-                return;
-            }
+        // Initialize
+        window.addEventListener('load', async () => {
+            await checkPackage();
+        });
 
-            // Show loading
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('error').classList.remove('show');
-            document.getElementById('result').classList.remove('show');
-            document.getElementById('generateBtn').disabled = true;
-
+        async function checkPackage() {
             try {
-                // Step 1: Check package URL
-                const proxyResponse = await fetch('/.netlify/functions/proxy', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ pkgUrl })
-                });
+                // Get file info
+                const response = await fetch(PKG_URL, { method: 'HEAD' });
 
-                const proxyData = await proxyResponse.json();
+                if (response.ok) {
+                    const size = response.headers.get('content-length');
+                    const formattedSize = formatBytes(size || 0);
 
-                if (!proxyResponse.ok) {
-                    throw new Error(proxyData.error || 'Cannot access package URL');
+                    fileSize.textContent = formattedSize;
+                    fileStatus.textContent = '✅ Available';
+                    fileStatus.style.color = '#00ff00';
+
+                    showStatus('Package is ready for installation!', 'success');
+                } else {
+                    fileStatus.textContent = '❌ Unavailable';
+                    fileStatus.style.color = '#ff0000';
+                    showStatus('Cannot access package file. Please check the URL.', 'error');
+                    installBtn.disabled = true;
+                }
+            } catch (error) {
+                fileStatus.textContent = '❌ Connection Error';
+                fileStatus.style.color = '#ff0000';
+                showStatus('Network error. Please check your connection.', 'error');
+                installBtn.disabled = true;
+            }
+        }
+
+        function startPS4Installation() {
+            showLoading();
+
+            // Generate installation URL
+            const installUrl = `${window.location.origin}${DIRECT_INSTALL_URL}?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
+
+            // For PS4: Try to open directly
+            try {
+                // Method 1: Open in new window
+                window.open(installUrl, '_blank');
+
+                // Method 2: Try to redirect if on PS4
+                const isPS4 = /PlayStation|PS4/i.test(navigator.userAgent);
+                if (isPS4) {
+                    setTimeout(() => {
+                        window.location.href = installUrl;
+                    }, 1000);
                 }
 
-                // Step 2: Generate installation payload
-                const payloadResponse = await fetch('/.netlify/functions/generate-payload', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        pkgUrl,
-                        filename: proxyData.filename,
-                        size: proxyData.size,
-                        userIp: await getLocalIP()
-                    })
-                });
+                showStatus('Opening installation page...', 'info');
+                showQRCode();
 
-                const payloadData = await payloadResponse.json();
-
-                if (!payloadResponse.ok) {
-                    throw new Error(payloadData.error || 'Failed to generate payload');
-                }
-
-                // Display results
-                document.getElementById('packageInfo').innerHTML = `
-                    <p><strong>Package:</strong> ${proxyData.filename}</p>
-                    <p><strong>Size:</strong> ${formatBytes(proxyData.size)}</p>
-                    <p><strong>URL:</strong> ${pkgUrl}</p>
-                `;
-
-                document.getElementById('instructionList').innerHTML =
-                    payloadData.instructions.map(inst => `<li>${inst}</li>`).join('');
-
-                document.getElementById('installLink').href = payloadData.installationUrl;
-
-                // Store data for copying
-                window.installData = payloadData;
-
-                // Show result
-                document.getElementById('result').classList.add('show');
+                // Store for QR code
+                window.ps4InstallUrl = installUrl;
 
             } catch (error) {
-                showError(error.message);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('generateBtn').disabled = false;
+                showStatus('Please manually navigate to the installation page.', 'info');
             }
+
+            hideLoading();
         }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
-            errorDiv.classList.add('show');
-        }
+        function showQRCode() {
+            const installUrl = window.ps4InstallUrl || `${window.location.origin}${DIRECT_INSTALL_URL}?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
 
-        function getLocalIP() {
-            return new Promise((resolve) => {
-                // Simplified IP detection for web
-                fetch('https://api.ipify.org?format=json')
-                    .then(res => res.json())
-                    .then(data => resolve(data.ip))
-                    .catch(() => resolve('unknown'));
+            // Generate QR Code
+            qrContainer.style.display = 'block';
+            document.getElementById('qrcode').innerHTML = '';
+
+            QRCode.toCanvas(document.getElementById('qrcode'), installUrl, {
+                width: 200,
+                height: 200,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            }, function (error) {
+                if (error) {
+                    document.getElementById('qrcode').innerHTML =
+                        '<p style="color: red;">QR Code generation failed</p>';
+                }
             });
+
+            // Show direct link
+            directLink.textContent = installUrl;
+            directLink.innerHTML = `<a href="${installUrl}" target="_blank" style="color: #00d4ff;">${installUrl}</a>`;
+        }
+
+        function copyDirectLink() {
+            const installUrl = window.ps4InstallUrl || `${window.location.origin}${DIRECT_INSTALL_URL}?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
+
+            navigator.clipboard.writeText(installUrl)
+                .then(() => {
+                    showStatus('PS4 installation link copied to clipboard!', 'success');
+                })
+                .catch(err => {
+                    showStatus('Failed to copy. Please manually copy the link.', 'error');
+                });
+        }
+
+        function showLoading() {
+            loading.style.display = 'block';
+            installBtn.disabled = true;
+            qrBtn.disabled = true;
+            copyBtn.disabled = true;
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+            installBtn.disabled = false;
+            qrBtn.disabled = false;
+            copyBtn.disabled = false;
+        }
+
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = 'status ' + type;
+            status.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
         }
 
         function formatBytes(bytes) {
@@ -430,34 +501,21 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function copyInstallLink() {
-            if (!window.installData) return;
+        // Auto-detect PS4 browser
+        const isPS4 = /PlayStation|PS4/i.test(navigator.userAgent);
+        if (isPS4) {
+            document.getElementById('instructionList').innerHTML = `
+                <li>Click "Install on PS4" button below</li>
+                <li>The installation will start automatically</li>
+                <li>Wait for the download to complete</li>
+                <li>Check your PS4 notifications</li>
+                <li>Install from the notifications menu</li>
+            `;
 
-            const installUrl = window.location.origin + window.installData.installationUrl;
-
-            navigator.clipboard.writeText(installUrl)
-                .then(() => {
-                    alert('Installation link copied to clipboard! Open this on your PS4 browser.');
-                })
-                .catch(err => {
-                    console.error('Copy failed:', err);
-                });
-        }
-
-        // Auto-focus URL input
-        document.getElementById('pkgUrl').focus();
-
-        // Handle Enter key
-        document.getElementById('pkgUrl').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') startInstallation();
-        });
-
-        // Check if URL is passed as parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlParam = urlParams.get('url');
-        if (urlParam) {
-            document.getElementById('pkgUrl').value = decodeURIComponent(urlParam);
-            startInstallation();
+            // Auto-start installation on PS4
+            setTimeout(() => {
+                showStatus('PS4 detected. Ready to install...', 'info');
+            }, 1000);
         }
     </script>
 </body>

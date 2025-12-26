@@ -1,13 +1,10 @@
 {
-    "name": "ps4-web-installer",
+    "name": "ps4-direct-installer",
     "version": "1.0.0",
-    "description": "Direct PS4 PKG installer from web",
+    "description": "Direct PS4 PKG installer for GitHub files",
     "main": "index.js",
     "scripts": {
         "build": "echo 'No build needed'"
     },
-    "dependencies": {
-        "node-fetch": "^2.6.7",
-        "buffer": "^6.0.3"
-    }
+    "dependencies": {}
 }

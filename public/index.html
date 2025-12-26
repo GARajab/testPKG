@@ -1,0 +1,479 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS4 Package Installer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .instructions {
+            background: #e8f4fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .download-btn {
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 PS4 Package Installer</h1>
+            <div class="subtitle">Stream and install PKG files to your PS4</div>
+        </div>
+
+        <div class="content">
+            <div class="note">
+                <strong>⚠️ Important:</strong> You need to run a callback server on your local machine.
+                The PS4 will connect to it to download the package. Use the provided server script below.
+            </div>
+
+            <div class="form-group">
+                <label for="pcIp">Your Computer IP Address:</label>
+                <input type="text" id="pcIp" placeholder="192.168.1.100">
+            </div>
+
+            <div class="form-group">
+                <label for="ps4Ip">PS4 IP Address:</label>
+                <input type="text" id="ps4Ip" placeholder="192.168.1.200">
+            </div>
+
+            <div class="form-group">
+                <label for="pkgName">Package Filename:</label>
+                <input type="text" id="pkgName" placeholder="game.pkg">
+            </div>
+
+            <div class="form-group">
+                <label for="pkgSize">Package Size (bytes, optional):</label>
+                <input type="text" id="pkgSize" placeholder="1048576000">
+            </div>
+
+            <button class="btn" id="generateBtn" onclick="generateInstall()">
+                Generate Installation Files
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating payload and metadata...</p>
+            </div>
+
+            <div class="result" id="result">
+                <h2>✅ Files Generated Successfully!</h2>
+
+                <div class="instructions">
+                    <h3>📋 Installation Instructions:</h3>
+                    <ol id="instructionList"></ol>
+                </div>
+
+                <button class="btn download-btn" onclick="downloadPayload()">
+                    📥 Download Payload
+                </button>
+                <button class="btn download-btn" onclick="downloadMetadata()">
+                    📥 Download Metadata
+                </button>
+
+                <div style="margin-top: 20px;">
+                    <h3>🚀 Local Callback Server:</h3>
+                    <p>Save this script as <code>callback-server.js</code> on your computer:</p>
+                    <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">
+const net = require('net');
+const http = require('http');
+const fs = require('fs');
+
+const PC_IP = "<span id="serverIp">192.168.1.100</span>";
+const CALLBACK_PORT = 9022;
+const NPX_PORT = 8080;
+
+class CallbackServer {
+    constructor() {
+        this.pkgSize = 0;
+        this.pkgName = "";
+        this.callbackSocket = null;
+    }
+
+    async start() {
+        console.log("🔄 Starting callback server...");
+        
+        const server = net.createServer((socket) => {
+            this.callbackSocket = socket;
+            console.log(`✅ PS4 connected from ${socket.remoteAddress}`);
+            this.sendMetadata();
+            
+            // Start streaming the package
+            this.streamPackage();
+        });
+
+        server.listen(CALLBACK_PORT, () => {
+            console.log(`📡 Callback server listening on ${PC_IP}:${CALLBACK_PORT}`);
+        });
+
+        server.on("error", (err) => {
+            console.error(`❌ Server error: ${err.message}`);
+        });
+    }
+
+    sendMetadata() {
+        if (!this.callbackSocket) return;
+        
+        try {
+            // Decode metadata from base64
+            const metadata = Buffer.from("<span id="metadataPlaceholder">PASTE_METADATA_HERE</span>", 'base64');
+            this.callbackSocket.write(metadata);
+            console.log("✅ Metadata sent to PS4");
+        } catch (err) {
+            console.error(`❌ Metadata error: ${err.message}`);
+        }
+    }
+
+    async streamPackage() {
+        const pkgUrl = `http://${PC_IP}:${NPX_PORT}/pkgs/${this.pkgName}`;
+        console.log(`📥 Streaming from: ${pkgUrl}`);
+
+        http.get(pkgUrl, (res) => {
+            let sentBytes = 0;
+            let lastReport = 0;
+
+            res.on("data", (chunk) => {
+                if (this.callbackSocket) {
+                    this.callbackSocket.write(chunk);
+                    sentBytes += chunk.length;
+                    
+                    if (sentBytes - lastReport >= 5 * 1024 * 1024) {
+                        const progress = (sentBytes / this.pkgSize) * 100;
+                        console.log(`📊 ${progress.toFixed(1)}% (${sentBytes}/${this.pkgSize} bytes)`);
+                        lastReport = sentBytes;
+                    }
+                }
+            });
+
+            res.on("end", () => {
+                console.log(`✅ Transfer complete: ${sentBytes} bytes`);
+                if (this.callbackSocket) this.callbackSocket.end();
+            });
+
+            res.on("error", (err) => {
+                console.error(`❌ Stream error: ${err.message}`);
+                if (this.callbackSocket) this.callbackSocket.destroy();
+            });
+        });
+    }
+}
+
+// Get package name from command line
+const pkgName = process.argv[2];
+if (!pkgName) {
+    console.log("Usage: node callback-server.js <package-name>");
+    process.exit(1);
+}
+
+const server = new CallbackServer();
+server.pkgName = pkgName;
+server.pkgSize = parseInt(process.argv[3]) || 0;
+server.start();</pre>
+
+                    <p style="margin-top: 10px;">
+                        <strong>Usage:</strong><br>
+                        <code>node callback-server.js game.pkg 1048576000</code>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateInstall() {
+            const pcIp = document.getElementById('pcIp').value;
+            const ps4Ip = document.getElementById('ps4Ip').value;
+            const pkgName = document.getElementById('pkgName').value;
+            const pkgSize = document.getElementById('pkgSize').value;
+
+            if (!pcIp || !ps4Ip || !pkgName) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+
+            try {
+                const response = await fetch('/.netlify/functions/start-install', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pcIp,
+                        ps4Ip,
+                        pkgName,
+                        pkgSize: parseInt(pkgSize) || 0
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store data for downloads
+                    window.installationData = data;
+
+                    // Update server script with actual values
+                    document.getElementById('serverIp').textContent = pcIp;
+                    document.getElementById('metadataPlaceholder').textContent = data.metadata;
+
+                    // Show instructions
+                    const instructionList = document.getElementById('instructionList');
+                    instructionList.innerHTML = data.instructions.map(inst =>
+                        `<li>${inst}</li>`
+                    ).join('');
+
+                    // Show result
+                    document.getElementById('result').classList.add('show');
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Network error: ${error.message}`);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('generateBtn').disabled = false;
+            }
+        }
+
+        function downloadPayload() {
+            if (!window.installationData?.payload) {
+                alert('No payload generated yet');
+                return;
+            }
+
+            const blob = new Blob([
+                Uint8Array.from(atob(window.installationData.payload), c => c.charCodeAt(0))
+            ]);
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'payload.bin';
+            link.click();
+        }
+
+        function downloadMetadata() {
+            if (!window.installationData?.metadata) {
+                alert('No metadata generated yet');
+                return;
+            }
+
+            const blob = new Blob([window.installationData.metadata], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'metadata.txt';
+            link.click();
+        }
+
+        // Try to auto-detect local IP
+        async function detectLocalIP() {
+            try {
+                const pc = new RTCPeerConnection({ iceServers: [] });
+                pc.createDataChannel('');
+                pc.createOffer().then(sdp => pc.setLocalDescription(sdp));
+
+                pc.onicecandidate = (ice) => {
+                    if (ice.candidate && ice.candidate.candidate) {
+                        const ip = ice.candidate.candidate.split(' ')[4];
+                        if (ip && ip.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+                            document.getElementById('pcIp').value = ip;
+                            pc.onicecandidate = null;
+                            pc.close();
+                        }
+                    }
+                };
+            } catch (e) {
+                console.log('Could not auto-detect IP');
+            }
+        }
+
+        // Run on load
+        window.addEventListener('DOMContentLoaded', detectLocalIP);
+    </script>
+</body>
+
+</html>

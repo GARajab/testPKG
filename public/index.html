@@ -120,10 +120,6 @@
             font-size: 1.3em;
         }
 
-        .btn-danger {
-            background: linear-gradient(45deg, #ff416c, #ff4b2b);
-        }
-
         .btn-success {
             background: linear-gradient(45deg, #00b09b, #96c93d);
         }
@@ -223,19 +219,33 @@
             padding-left: 5px;
         }
 
-        .qr-container {
-            margin: 30px 0;
+        .url-input {
+            margin: 20px 0;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
         }
 
-        #qrcode {
-            display: inline-block;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            margin: 20px auto;
+        .url-input input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .url-input button {
+            background: #00d4ff;
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         .direct-link {
@@ -271,19 +281,17 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-store"></i> PS4 Store Installer</h1>
-            <div class="subtitle">One-click installation for PS4 Store Package</div>
+            <h1>🎮 PS4 Store Installer</h1>
+            <div class="subtitle">Install Store.pkg directly to your PS4</div>
         </div>
 
         <div class="package-card">
-            <h2><i class="fas fa-box"></i> Store Package</h2>
+            <h2>📦 Store Package</h2>
             <div class="package-info">
                 <div class="info-item">
                     <span>Package:</span>
@@ -291,7 +299,7 @@
                 </div>
                 <div class="info-item">
                     <span>Source:</span>
-                    <span>GitHub Repository</span>
+                    <span>GitHub</span>
                 </div>
                 <div class="info-item">
                     <span>Size:</span>
@@ -299,186 +307,274 @@
                 </div>
                 <div class="info-item">
                     <span>Status:</span>
-                    <span id="fileStatus">Verifying...</span>
+                    <span id="fileStatus">🔍 Verifying...</span>
                 </div>
             </div>
         </div>
 
+        <div class="url-input">
+            <h3>🔗 Package URL (You can change this):</h3>
+            <input type="url" id="pkgUrlInput" value="https://raw.githubusercontent.com/GARajab/testPKG/main/Store.pkg">
+            <button onclick="updatePackageUrl()">Update URL</button>
+            <p style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
+                Alternative URLs you can try:
+                <br>• https://raw.githubusercontent.com/GARajab/testPKG/main/Store.pkg
+                <br>• https://github.com/GARajab/testPKG/raw/main/Store.pkg
+            </p>
+        </div>
+
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Preparing installation...</p>
+            <p>Checking package...</p>
         </div>
 
         <div class="status" id="status"></div>
 
         <div class="instructions">
-            <h3><i class="fas fa-list-ol"></i> Installation Instructions:</h3>
+            <h3>📋 Installation Instructions:</h3>
             <ol id="instructionList">
+                <li>Make sure your PS4 is on firmware 9.00 or lower</li>
+                <li>Open the PS4 browser and go to the User Guide (exploit)</li>
                 <li>Click the "Install on PS4" button below</li>
-                <li>On your PS4, open the browser and navigate to the installation page</li>
-                <li>Click "Start Installation" on the PS4 browser</li>
-                <li>The PS4 will download and install the package automatically</li>
-                <li>Check your PS4 notifications for installation progress</li>
+                <li>On your PS4, open the installation link</li>
+                <li>Click "Start Installation" on the PS4</li>
+                <li>Check PS4 notifications for installation progress</li>
             </ol>
         </div>
 
         <div>
             <button class="btn btn-success" onclick="startPS4Installation()" id="installBtn">
-                <i class="fas fa-download"></i> Install on PS4
+                ⚡ Install on PS4
             </button>
 
-            <button class="btn" onclick="showQRCode()" id="qrBtn">
-                <i class="fas fa-qrcode"></i> Show QR Code
+            <button class="btn" onclick="testDirectDownload()" id="testBtn">
+                🧪 Test Download
             </button>
 
-            <button class="btn" onclick="copyDirectLink()" id="copyBtn">
-                <i class="fas fa-copy"></i> Copy PS4 Link
+            <button class="btn" onclick="copyPS4Link()" id="copyBtn">
+                📋 Copy PS4 Link
             </button>
         </div>
 
-        <div class="qr-container" id="qrContainer" style="display: none;">
-            <h3><i class="fas fa-mobile-alt"></i> Scan with PS4 Camera</h3>
-            <div id="qrcode"></div>
-            <div class="direct-link" id="directLink"></div>
+        <div class="direct-link" id="directLink" style="display: none;">
+            <p>PS4 Installation Link:</p>
+            <div id="installLinkText"></div>
         </div>
 
         <div class="footer">
-            <p><i class="fas fa-info-circle"></i> Works on PS4 with browser access. Ensure you have proper permissions.
-            </p>
+            <p>⚠️ Requires PS4 9.00 exploit. For educational purposes only.</p>
         </div>
     </div>
 
     <script>
-        // Configuration
-        const PKG_URL = 'https://github.com/GARajab/testPKG/raw/main/Store.pkg';
+        // Default package URL (using raw.githubusercontent.com which is more reliable)
+        let PKG_URL = 'https://raw.githubusercontent.com/GARajab/testPKG/main/Store.pkg';
         const PKG_NAME = 'Store.pkg';
-        const DIRECT_INSTALL_URL = '/install.html';
 
         // DOM Elements
         const installBtn = document.getElementById('installBtn');
-        const qrBtn = document.getElementById('qrBtn');
+        const testBtn = document.getElementById('testBtn');
         const copyBtn = document.getElementById('copyBtn');
         const loading = document.getElementById('loading');
         const status = document.getElementById('status');
-        const qrContainer = document.getElementById('qrContainer');
         const directLink = document.getElementById('directLink');
+        const installLinkText = document.getElementById('installLinkText');
         const fileSize = document.getElementById('fileSize');
         const fileStatus = document.getElementById('fileStatus');
+        const pkgUrlInput = document.getElementById('pkgUrlInput');
 
         // Initialize
         window.addEventListener('load', async () => {
             await checkPackage();
         });
 
-        async function checkPackage() {
-            try {
-                // Get file info
-                const response = await fetch(PKG_URL, { method: 'HEAD' });
-
-                if (response.ok) {
-                    const size = response.headers.get('content-length');
-                    const formattedSize = formatBytes(size || 0);
-
-                    fileSize.textContent = formattedSize;
-                    fileStatus.textContent = '✅ Available';
-                    fileStatus.style.color = '#00ff00';
-
-                    showStatus('Package is ready for installation!', 'success');
-                } else {
-                    fileStatus.textContent = '❌ Unavailable';
-                    fileStatus.style.color = '#ff0000';
-                    showStatus('Cannot access package file. Please check the URL.', 'error');
-                    installBtn.disabled = true;
-                }
-            } catch (error) {
-                fileStatus.textContent = '❌ Connection Error';
-                fileStatus.style.color = '#ff0000';
-                showStatus('Network error. Please check your connection.', 'error');
-                installBtn.disabled = true;
+        function updatePackageUrl() {
+            const newUrl = pkgUrlInput.value.trim();
+            if (newUrl && newUrl.startsWith('http')) {
+                PKG_URL = newUrl;
+                showStatus('URL updated! Checking package...', 'info');
+                checkPackage();
+            } else {
+                showStatus('Please enter a valid URL starting with http:// or https://', 'error');
             }
         }
 
-        function startPS4Installation() {
+        async function checkPackage() {
             showLoading();
 
-            // Generate installation URL
-            const installUrl = `${window.location.origin}${DIRECT_INSTALL_URL}?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
+            // Try multiple methods to check the file
+            const methods = [
+                { url: PKG_URL, method: 'HEAD' },
+                { url: PKG_URL.replace('raw.githubusercontent.com', 'github.com') + '?raw=true', method: 'HEAD' },
+                { url: PKG_URL, method: 'GET' },
+            ];
 
-            // For PS4: Try to open directly
-            try {
-                // Method 1: Open in new window
-                window.open(installUrl, '_blank');
+            let success = false;
+            let actualSize = 0;
 
-                // Method 2: Try to redirect if on PS4
-                const isPS4 = /PlayStation|PS4/i.test(navigator.userAgent);
-                if (isPS4) {
-                    setTimeout(() => {
-                        window.location.href = installUrl;
-                    }, 1000);
+            for (const method of methods) {
+                try {
+                    const response = await fetchWithTimeout(method.url, {
+                        method: method.method,
+                        mode: 'no-cors' // Try no-cors for CORS issues
+                    }).catch(e => null);
+
+                    if (response && response.ok) {
+                        actualSize = response.headers.get('content-length') || 0;
+                        success = true;
+
+                        // Update to the working URL
+                        if (method.url !== PKG_URL) {
+                            PKG_URL = method.url;
+                            pkgUrlInput.value = PKG_URL;
+                        }
+                        break;
+                    }
+                } catch (error) {
+                    console.log(`Method ${method.method} failed:`, error.message);
+                    continue;
                 }
+            }
 
-                showStatus('Opening installation page...', 'info');
-                showQRCode();
+            if (success) {
+                const formattedSize = formatBytes(actualSize);
+                fileSize.textContent = formattedSize;
+                fileStatus.textContent = '✅ Available';
+                fileStatus.style.color = '#00ff00';
 
-                // Store for QR code
-                window.ps4InstallUrl = installUrl;
+                showStatus(`Package ready (${formattedSize})!`, 'success');
 
-            } catch (error) {
-                showStatus('Please manually navigate to the installation page.', 'info');
+                // Enable install button
+                installBtn.disabled = false;
+                installBtn.innerHTML = '⚡ Install on PS4';
+            } else {
+                // Try one more time with proxy
+                try {
+                    const proxyCheck = await fetch(`https://corsproxy.io/?${encodeURIComponent(PKG_URL)}`, { method: 'HEAD' });
+                    if (proxyCheck.ok) {
+                        const size = proxyCheck.headers.get('content-length') || 0;
+                        const formattedSize = formatBytes(size);
+                        fileSize.textContent = formattedSize;
+                        fileStatus.textContent = '⚠️ Available (via proxy)';
+                        fileStatus.style.color = '#ffaa00';
+
+                        showStatus(`Package available via proxy (${formattedSize})`, 'info');
+                        installBtn.disabled = false;
+                    } else {
+                        throw new Error('Proxy check failed');
+                    }
+                } catch (proxyError) {
+                    fileStatus.textContent = '❌ Connection Failed';
+                    fileStatus.style.color = '#ff0000';
+                    showStatus('Cannot access package. The URL might be incorrect or blocked by CORS.', 'error');
+                    installBtn.disabled = true;
+                }
             }
 
             hideLoading();
         }
 
-        function showQRCode() {
-            const installUrl = window.ps4InstallUrl || `${window.location.origin}${DIRECT_INSTALL_URL}?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
-
-            // Generate QR Code
-            qrContainer.style.display = 'block';
-            document.getElementById('qrcode').innerHTML = '';
-
-            QRCode.toCanvas(document.getElementById('qrcode'), installUrl, {
-                width: 200,
-                height: 200,
-                color: {
-                    dark: '#000000',
-                    light: '#ffffff'
-                }
-            }, function (error) {
-                if (error) {
-                    document.getElementById('qrcode').innerHTML =
-                        '<p style="color: red;">QR Code generation failed</p>';
-                }
-            });
-
-            // Show direct link
-            directLink.textContent = installUrl;
-            directLink.innerHTML = `<a href="${installUrl}" target="_blank" style="color: #00d4ff;">${installUrl}</a>`;
+        function fetchWithTimeout(url, options = {}, timeout = 5000) {
+            return Promise.race([
+                fetch(url, options),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timeout')), timeout)
+                )
+            ]);
         }
 
-        function copyDirectLink() {
-            const installUrl = window.ps4InstallUrl || `${window.location.origin}${DIRECT_INSTALL_URL}?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
+        function startPS4Installation() {
+            showLoading();
 
-            navigator.clipboard.writeText(installUrl)
+            // Generate PS4 installation URL
+            const baseUrl = window.location.origin;
+            const installUrl = `${baseUrl}/install.html?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
+
+            // Store for later use
+            window.ps4InstallUrl = installUrl;
+
+            // Show the link
+            directLink.style.display = 'block';
+            installLinkText.innerHTML = `<a href="${installUrl}" target="_blank" style="color: #00d4ff; word-break: break-all;">${installUrl}</a>`;
+
+            // For PS4 detection
+            const isPS4 = /PlayStation|PS4/i.test(navigator.userAgent);
+
+            if (isPS4) {
+                // If on PS4, redirect immediately
+                showStatus('PS4 detected! Redirecting to installer...', 'info');
+                setTimeout(() => {
+                    window.location.href = installUrl;
+                }, 2000);
+            } else {
+                // If on PC/phone, show instructions
+                showStatus('Copy the PS4 link above and open it on your PS4 browser', 'info');
+
+                // Try to copy to clipboard
+                copyToClipboard(installUrl);
+            }
+
+            hideLoading();
+        }
+
+        function testDirectDownload() {
+            showLoading();
+            showStatus('Testing direct download...', 'info');
+
+            // Try to trigger download
+            const link = document.createElement('a');
+            link.href = PKG_URL;
+            link.download = PKG_NAME;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+
+            setTimeout(() => {
+                link.click();
+                document.body.removeChild(link);
+
+                showStatus('Download triggered! Check your downloads folder.', 'success');
+                hideLoading();
+            }, 1000);
+        }
+
+        function copyPS4Link() {
+            if (!window.ps4InstallUrl) {
+                // Generate if not exists
+                const baseUrl = window.location.origin;
+                window.ps4InstallUrl = `${baseUrl}/install.html?pkg=${encodeURIComponent(PKG_URL)}&name=${encodeURIComponent(PKG_NAME)}`;
+            }
+
+            copyToClipboard(window.ps4InstallUrl);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
                 .then(() => {
-                    showStatus('PS4 installation link copied to clipboard!', 'success');
+                    showStatus('Link copied to clipboard!', 'success');
                 })
                 .catch(err => {
-                    showStatus('Failed to copy. Please manually copy the link.', 'error');
+                    // Fallback method
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showStatus('Link copied!', 'success');
                 });
         }
 
         function showLoading() {
             loading.style.display = 'block';
             installBtn.disabled = true;
-            qrBtn.disabled = true;
+            testBtn.disabled = true;
             copyBtn.disabled = true;
         }
 
         function hideLoading() {
             loading.style.display = 'none';
             installBtn.disabled = false;
-            qrBtn.disabled = false;
+            testBtn.disabled = false;
             copyBtn.disabled = false;
         }
 
@@ -494,28 +590,11 @@
         }
 
         function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
+            if (!bytes || bytes === 0) return 'Unknown';
             const k = 1024;
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Auto-detect PS4 browser
-        const isPS4 = /PlayStation|PS4/i.test(navigator.userAgent);
-        if (isPS4) {
-            document.getElementById('instructionList').innerHTML = `
-                <li>Click "Install on PS4" button below</li>
-                <li>The installation will start automatically</li>
-                <li>Wait for the download to complete</li>
-                <li>Check your PS4 notifications</li>
-                <li>Install from the notifications menu</li>
-            `;
-
-            // Auto-start installation on PS4
-            setTimeout(() => {
-                showStatus('PS4 detected. Ready to install...', 'info');
-            }, 1000);
         }
     </script>
 </body>

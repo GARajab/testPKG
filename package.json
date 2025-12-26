@@ -1,7 +1,7 @@
 {
-    "name": "ps4-direct-installer",
+    "name": "ps4-store-installer",
     "version": "1.0.0",
-    "description": "Direct PS4 PKG installer for GitHub files",
+    "description": "Direct PS4 Store.pkg installer",
     "main": "index.js",
     "scripts": {
         "build": "echo 'No build needed'"
